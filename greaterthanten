@@ -1,0 +1,32 @@
+SECTION .data
+
+  x dd 30
+  msg1 db "X is greater than 10", 10, 0
+  msg2 db "X is less than 10", 10, 0
+  
+SECTION .text
+
+  extern printf
+
+global main
+main:
+  push ebp
+  mov ebp, esp
+  
+  cmp DWORD[x], 10
+  jg .conditionIsTrue
+  
+  .conditionIsNotTrue:
+    push DWORD msg2
+    call printf
+    
+  .conditionIsTrue:
+    push DWORD msg1
+    call printf
+  jmp .done
+  
+  .done:
+    mov esp, ebp
+    pop ebp
+    ret
+  
