@@ -1,0 +1,133 @@
+%include "asm_io.inc"
+segment .data 
+	prompt1 db "Enter 1st number: ", 0
+	prompt2 db "Enter 2nd number: ", 0
+	prompt3 db "Enter 3rd number: ", 0
+	min_msg db "The minimum is ", 0
+	max_msg db "The maximum is ", 0
+	product db "The product is ", 0
+	gcd_msg db "The GCD is ", 0
+
+segment .bss 
+	input1 resd 1
+	input2 resd 1
+	input3 resd 1
+	gcd1 resd 1
+
+segment .text
+        global  asm_main
+	global  minimum
+	global  maximum
+	global  prodrout
+	global  gcd
+	global  while
+	global  whiledone
+
+asm_main:
+        enter   0,0               ; setup routine
+        pusha
+
+	mov eax, prompt1
+	call print_string
+	
+	call read_int
+	mov [input1], eax
+	
+	mov eax, prompt2
+	call print_string
+
+	call read_int
+	mov [input2], eax
+
+	mov eax, prompt3
+	call print_string
+	
+	call read_int
+	mov [input3], eax
+
+maximum:
+	mov eax, [input1]
+	mov ebx, [input2]
+	cmp eax, ebx
+	jnl .eaxbig
+	mov eax, ebx	
+.eaxbig:
+	mov ecx, [input3]
+	cmp eax, ecx
+	jnl .eaxbigagain
+	mov eax, ecx
+.eaxbigagain:
+	mov ecx, eax
+	mov eax, max_msg
+	call print_string
+	mov eax, ecx
+	call print_int
+	call print_nl
+
+minimum:
+	mov eax, [input1]
+	mov ebx, [input2]
+	cmp eax, ebx
+	jng .eaxsmall
+	mov eax, ebx
+.eaxsmall:
+	mov ecx, [input3]
+	cmp eax, ecx
+	jng .eaxsmallagain
+	mov eax, ecx
+.eaxsmallagain:
+	mov ecx, eax
+	mov eax, min_msg
+	call print_string
+	mov eax, ecx
+	call print_int
+	call print_nl
+
+prodrout:
+	mov eax, [input1]
+	mov ebx, [input2]
+	mul bl
+
+	mov ebx, [input3]
+	mul bx
+
+	shl edx, 16
+	mov dx, ax
+
+	mov eax, product
+	call print_string
+
+	mov eax, edx
+	call print_int
+	call print_nl
+
+gcd:
+	mov eax, [input1]
+	mov ebx, [input2]
+while:
+	cmp ebx, 0
+	je whiledone
+	push eax
+	cdq
+	idiv ebx
+
+	pop eax
+	mov eax, ebx
+	mov ebx, edx
+
+	cmp ebx, 0
+	jne while
+
+whiledone:
+	push eax
+	mov eax, gcd_msg
+	call print_string
+	pop eax
+	call print_int
+	call print_nl
+
+
+        popa
+        mov     eax, 0            ; return back to C
+        leave                     
+        ret
